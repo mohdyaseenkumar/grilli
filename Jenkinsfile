@@ -17,7 +17,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 // Stops any old container and starts the new one
-                sh 'docker stop grilli-site || true'
+                // sh 'docker stop grilli-site || true'
                 sh 'docker rm grilli-site || true'
                 sh 'docker run -d --name grilli-site -p 80:80 grilli-app'
             }
