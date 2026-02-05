@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     environment {
-        // 1. CHANGE THESE VALUES
+        // 1. MUST BE YOUR 12-DIGIT ACCOUNT NUMBER (e.g., 123456789012)
+        // DO NOT put your Access Key (AKIA...) here.
         AWS_ACCOUNT_ID = 'AKIAVJRDZX3VDDB5I3D7' 
-        AWS_REGION     = 'ap-south-2' // Based on your previous logs
+        AWS_REGION     = 'ap-south-2' 
         IMAGE_REPO     = 'grilli-app'
         ECR_URL        = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
@@ -25,19 +26,21 @@ pipeline {
 
         stage('Build and Push to ECR') {
             steps {
-                // This uses the 'aws-creds' you created in Jenkins
                 withCredentials([usernamePassword(credentialsId: 'aws-creds', 
                                  usernameVariable: 'AWS_ACCESS_KEY_ID', 
                                  passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     
                     script {
-                        // Login to ECR
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URL}"
+                        // NEW EDITED PART: Capturing password in a variable to avoid "400 Bad Request"
+                        def ecrPassword = sh(script: "aws ecr get-login-password --region ${AWS_REGION}", returnStdout: true).trim()
+                        
+                        // Login using the cleaned variable
+                        sh "echo ${ecrPassword} | docker login --username AWS --password-stdin ${ECR_URL}"
                         
                         // Build the image
                         sh "docker build -t ${IMAGE_REPO} ."
                         
-                        // Tag for ECR (both with build number and 'latest')
+                        // Tagging for ECR
                         sh "docker tag ${IMAGE_REPO}:latest ${ECR_URL}/${IMAGE_REPO}:${env.BUILD_NUMBER}"
                         sh "docker tag ${IMAGE_REPO}:latest ${ECR_URL}/${IMAGE_REPO}:latest"
                         
@@ -51,8 +54,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Deploying locally on your EC2 using the image we just built
                 sh 'docker rm -f grilli-site || true' 
+                // We use the local image name here for speed
                 sh 'docker run -d --name grilli-site -p 80:80 ${IMAGE_REPO}:latest'
             }
         }
@@ -60,7 +63,6 @@ pipeline {
     
     post {
         always {
-            // Housekeeping: Remove dangling images to save EC2 space
             sh 'docker image prune -f'
         }
     }
