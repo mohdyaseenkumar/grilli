@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    stages {
+        stage('Clone Metadata') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t grilli-app .'
+            }
+        }
+        stage('Push to ECR') {
+            steps {
+                // We will configure these credentials in Jenkins later
+                echo 'Pushing to AWS ECR...'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying to EC2...'
+                // Command to run the container on your instance
+            }
+        }
+    }
+}
