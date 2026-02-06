@@ -27,8 +27,8 @@ pipeline {
         stage('Build and Push to ECR') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-creds', 
-                                 usernameVariable: 'AWS_ACCESS_KEY_ID', 
-                                 passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                 usernameVariable: 'AKIAVJRDZX3VDDB5I3D7', 
+                                 passwordVariable: 'l+FtXh9R1WJ4p4ODf5nlx9ktfkIFcpSVZrwliSPM')]) {
                     
                     script {
                         // NEW EDITED PART: Capturing password in a variable to avoid "400 Bad Request"
