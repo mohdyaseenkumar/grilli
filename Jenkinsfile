@@ -4,7 +4,7 @@ pipeline {
     environment {
         // 1. MUST BE YOUR 12-DIGIT ACCOUNT NUMBER (e.g., 123456789012)
         // DO NOT put your Access Key (AKIA...) here.
-        AWS_ACCOUNT_ID = 'AKIAVJRDZX3VDDB5I3D7' 
+        AWS_ACCOUNT_ID = 'ACCESS KEY' 
         AWS_REGION     = 'ap-south-2' 
         IMAGE_REPO     = 'grilli-app'
         ECR_URL        = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -27,8 +27,8 @@ pipeline {
         stage('Build and Push to ECR') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-creds', 
-                                 usernameVariable: 'AKIAVJRDZX3VDDB5I3D7', 
-                                 passwordVariable: 'l+FtXh9R1WJ4p4ODf5nlx9ktfkIFcpSVZrwliSPM')]) {
+                                 usernameVariable: 'ACCESS KEY', 
+                                 passwordVariable: 'ACCESS SECurity')]) {
                     
                     script {
                         // NEW EDITED PART: Capturing password in a variable to avoid "400 Bad Request"
